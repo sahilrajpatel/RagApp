@@ -1,0 +1,78 @@
+# RAG Chatbot (LangChain + LangGraph)
+
+A simple RAG (Retrieval Augmented Generation) app I built to learn how LangChain and LangGraph work together. You give it some documents, it stores them in a vector database, and then you can ask questions about them and get answers based only on those documents.
+
+## What it does
+
+1. Reads PDF/TXT files from the `data` folder
+2. Splits them into chunks and stores them in a Chroma vector database
+3. When you ask a question, it retrieves the most relevant chunks and passes them to an LLM to generate an answer
+4. The retrieve → generate flow is built as a small graph using LangGraph
+
+## Project structure
+
+```
+simple-rag-app/
+├── main.py            # run this from the terminal (ingest / ask)
+├── app.py              # FastAPI version, if you want an API
+├── src/
+│   ├── config.py         # all settings in one place
+│   ├── load_data.py       # loads and splits documents
+│   ├── vector_store.py     # creates/loads the Chroma DB
+│   └── rag_graph.py         # the LangGraph pipeline (retrieve + generate)
+├── data/                # put your pdf/txt files here
+├── requirements.txt
+└── .env.example
+```
+
+I kept things split into separate files just so it's easier to read and change one part without touching the rest.
+
+## How to run it
+
+1. Install the dependencies
+```bash
+pip install -r requirements.txt
+```
+
+2. Add your OpenAI key
+```bash
+cp .env.example .env
+# then open .env and paste your key
+```
+
+3. Add your documents in the `data/` folder (a sample file is already there)
+
+4. Build the vector store
+```bash
+python main.py ingest
+```
+
+5. Ask a question
+```bash
+python main.py ask "What is this document about?"
+```
+
+### Using the API instead
+
+```bash
+uvicorn app:app --reload
+```
+Then go to `http://127.0.0.1:8000/docs` and try the `/ingest` and `/ask` endpoints.
+
+## Tech used
+
+- LangChain – loading, splitting, prompts
+- LangGraph – for the retrieve → generate flow
+- Chroma – vector database
+- OpenAI – embeddings + chat model
+- FastAPI – optional API layer
+
+## Things I want to add later
+
+- Support for more file types (docx, csv)
+- A basic frontend instead of just API/CLI
+- Maybe try a free/open source embedding model instead of OpenAI
+
+## Note
+
+This was built as a learning project to understand RAG pipelines and LangGraph. Feel free to fork it and use it for your own docs.
